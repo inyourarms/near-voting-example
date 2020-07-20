@@ -1,4 +1,5 @@
 ![Sync Fork](https://github.com/inyourarms/near-voting-example/workflows/Sync%20Fork/badge.svg)
+![CI](https://github.com/inyourarms/near-voting-example/workflows/CI/badge.svg)
 
 Near voting DApp example in Rust Fix-05
 =================================
