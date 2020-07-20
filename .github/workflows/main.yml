@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: TG908/fork-sync@v1.1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PAT_TOKEN }}
           owner: spdd
           base: master
           head: fix-01
