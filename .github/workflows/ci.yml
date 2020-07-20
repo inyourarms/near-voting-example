@@ -7,7 +7,9 @@ name: CI
 on:
   pull_request:
     types: [closed]
-    branches: [ master ]
+    branches:
+      - master
+      - fix-01
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
