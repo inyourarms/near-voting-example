@@ -15,4 +15,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           owner: spdd
           base: master
-          head: master
+          head: fix-01
