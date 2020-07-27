@@ -46,4 +46,4 @@ jobs:
     # Run nearup with binaries
     - name: Run nearup with binaries
       run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '~/.nearup/nearup stop && ~/.nearup/nearup betanet --nodocker --binary-path ~/release/' 
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '~/.nearup/nearup stop && ~/.nearup/nearup guildnet --nodocker --binary-path ~/release/' 
