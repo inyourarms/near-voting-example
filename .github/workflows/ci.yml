@@ -20,7 +20,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Install Rust
-    - uses: hecrj/setup-rust-action@v1
+      uses: hecrj/setup-rust-action@v1
       with:
         rust-version: nightly-2020-03-19
 
