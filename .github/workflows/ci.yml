@@ -19,16 +19,31 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - name: Install Rust
+    - uses: hecrj/setup-rust-action@v1
+      with:
+        rust-version: nightly-2020-03-19
+
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    # Runs a single command using the runners shell
-    - name: Run when merged
-      if: github.action == 'closed' && github.pull_request.merged == 'true'
-      run: echo Hello, world Mearged!
+    # Build nearcore
+    - name: Build nearcore
+      run: make release
 
-    # Runs a set of commands using the runners shell
-    - name: Run a multi-line script
+    # Copy binaries to server
+    - name: Copy binaries to a server
       run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+        echo "${{ secrets.SSH_PRIV_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+        echo "${{ secrets.SSH_PUB_KEY }}" > ~/.ssh/id_rsa.pub
+        chmod 700 ~/.ssh/id_rsa
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa 
+        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+        
+        scp -r -o StrictHostKeyChecking=no target/release/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/
+        
+    # Run nearup with binaries
+    - name: Run nearup with binaries
+      run: |
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '~/.nearup/nearup stop && ~/.nearup/nearup betanet --nodocker --binary-path ~/release/' 
