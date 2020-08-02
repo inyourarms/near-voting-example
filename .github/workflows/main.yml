@@ -2,7 +2,7 @@ name: Sync Fork
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/10 * * * *'
 
 env:
   REPO: "nearprotocol/nearcore"
@@ -13,7 +13,7 @@ jobs:
     steps:
       - shell: bash
         run: |
-          latest_release=$(curl -s $GITHUB_API_UR/repos/nearprotocol/nearcore/releases | jq .[0])
+          latest_release=$(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq .[0])
           echo $latest_release
           github_tag=$(echo $latest_release | jq -r '.tag_name')
 
@@ -100,7 +100,7 @@ jobs:
           echo "Print test var"
           echo $TEST_VAR
           
-          workflow_run=$(curl $GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs | 
+          workflow_run=$(curl https://api.github.com/repos/inyourarms/near-voting-example/actions/runs | 
           jq -r '.workflow_runs[0]')
 
           logs_url=$(echo $workflow_run | jq -r '.logs_url')
@@ -111,7 +111,7 @@ jobs:
 
           step_number=1
 
-          job=$(curl $GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs/$job_id/jobs |  jq -r '.jobs[0]')
+          job=$(curl https://api.github.com/repos/inyourarms/near-voting-example/actions/runs/$job_id/jobs |  jq -r '.jobs[0]')
 
           job_name=$(echo $job | jq -r '.name')
           step_name=$(echo $job | jq -r .steps[$step_number].name)
