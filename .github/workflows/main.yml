@@ -41,8 +41,8 @@ jobs:
         run: |
           github_tag=`cat github-tag.txt`
           echo $github_tag
-          
-      - name: Get Docker Hub Tags
+      - uses: actions/checkout@v2
+      - name: Get Docker Hub Tags   
         if: ${{ success() }}
         env:
           DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
