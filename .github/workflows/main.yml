@@ -59,11 +59,11 @@ jobs:
               exit 1
             else
               # Build the Docker image with github tag
-              echo "FROM scratch" > DockerHello
-              echo "ADD hello /" >> DockerHello
-              echo 'CMD ["/hello"]' >> DockerHello
+              echo "FROM scratch" > Dockerfile
+              echo "ADD hello /" >> Dockerfile
+              echo 'CMD ["/hello"]' >> Dockerfile
               echo "Build a new image: $github_tag"
-              docker build . --file DockerHello --tag nearcore:$github_tag
+              docker build . --file Dockerfile --tag nearcore:$github_tag
             fi
           done
 
@@ -78,6 +78,7 @@ jobs:
       - name: Build Latest Docker Image
         if: ${{ success() }}
         run: | 
+          rm Dockerfile
           github_tag=`cat github-tag.txt`
           docker rmi nearcore:$github_tag
           git clone -b $github_tag https://github.com/nearprotocol/nearcore.git
