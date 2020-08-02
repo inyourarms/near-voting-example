@@ -38,6 +38,5 @@ jobs:
           unzip logs.zip
           cd $job_name
           issue_msg="$(cat $($step_number+1)_$step_name.txt)"
-          echo "$issue_msg" 
 
           curl -u "inyourarms":"${{ secrets.PAT_TOKEN }}" https://api.github.com/repos/spdd/near-voting-example/issues -d '{"title":"$step_name","body":"$issue_msg"}'
