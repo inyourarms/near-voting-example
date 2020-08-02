@@ -78,6 +78,9 @@ jobs:
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
+          github_tag=`cat github-tag.txt`
+          echo $github_tag
+          
           echo "Print test var"
           echo $TEST_VAR
           
