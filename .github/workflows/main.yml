@@ -13,7 +13,7 @@ jobs:
     steps:
       - shell: bash
         run: |
-          latest_release=$(curl -s $GITHUB_API_UR/repos/$REPO/releases | jq .[0])
+          latest_release=$(curl -s $GITHUB_API_UR/repos/nearprotocol/nearcore/releases | jq .[0])
           echo $latest_release
           github_tag=$(echo $latest_release | jq -r '.tag_name')
 
@@ -80,7 +80,7 @@ jobs:
         run: | 
           github_tag=`cat github_tag.txt`
           docker rmi nearcore:$github_tag
-          git clone -b $github_tag https://github.com/$REPO.git
+          git clone -b $github_tag https://github.com/nearprotocol/nearcore.git
           cd nearcore
           docker build . --file Dockerfile --tag nearcore:latest
 
