@@ -103,7 +103,7 @@ jobs:
           docker rmi nearcore:$github_tag
           git clone -b $github_tag https://github.com/nearprotocol/nearcore.git
           cd nearcore
-          docker build . --file Dockerfile --tag nearcore:latest
+          DOCKER_BUILDKIT=1 docker build . --file Dockerfile --tag nearcore:latest
 
       - name: Publish Latest Docker Image to Registry
         if: ${{ success() }}
