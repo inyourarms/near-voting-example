@@ -110,7 +110,7 @@ jobs:
 
           job_id=$(echo $workflow_run | jq -r '.id')
 
-          step_number=1
+          step_number=0
 
           job=$(curl https://api.github.com/repos/inyourarms/near-voting-example/actions/runs/$job_id/jobs |  jq -r '.jobs[0]')
 
