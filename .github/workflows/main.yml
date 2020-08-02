@@ -2,10 +2,9 @@ name: Sync Fork
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/80 * * * *'
 
 env:
-  REPO: "nearprotocol/nearcore"
   DOCKER_BUILDKIT: 1 
 
 jobs:
@@ -25,25 +24,11 @@ jobs:
           else
             echo $github_tag > github-tag.txt
           fi
-      - name: Upload github tag
-        uses: actions/upload-artifact@v2
-        with:
-          name: github-tag
-          path: github-tag.txt
   build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: Download-github-tag
-        uses: actions/download-artifact@v2
-        with:
-          name: github-tag
-      - shell: bash
-        run: |
-          github_tag=`cat github-tag.txt`
-          echo $github_tag
-      
       - name: Get Docker Hub Tags   
         if: ${{ success() }}
         env:
@@ -58,28 +43,15 @@ jobs:
             # if $github_tag contains in $tag
             if [[ $tag == *"$github_tag"* ]]; then
               echo "The tag:$tag already deployed"
-              #exit 1
+              exit 1
             elif [ -z "$tag" ]; then
-              # Build the Docker image with github tag
-              touch hello
-              echo "FROM scratch" > Dockerfile
-              echo "ADD hello /" >> Dockerfile
-              echo 'CMD ["/hello"]' >> Dockerfile
-              echo "Build a new image: $github_tag"
-              docker build . --file Dockerfile --tag nearcore:$github_tag
-              echo "Currenw PWD!"
-              echo $PWD
-              cp Dockerfile /home/runner/work/near-voting-example/near-voting-example/
+              # Create an empty Dockerfile for a Docker image with github tag 
+              touch hello && echo "FROM scratch" > Dockerfile
+              echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
             fi
           done
           
           echo ::set-env name=RELEASE_VERSION::$(echo $github_tag)
-          
-          touch hello && echo "FROM scratch" > Dockerfile
-          echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
-          echo "Build a new image: $github_tag"
-          #docker build --file Dockerfile --tag nearcore:$github_tag .
-
 
       - name: Publish GitHub Tag to Registry
         if: ${{ success() }}
@@ -90,14 +62,14 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: ${{ env.RELEASE_VERSION }}
           
-      - name: Clone nearcore
+      - name: Clone NEARCore
         if: ${{ success() }}
         uses: actions/checkout@v2
         with:
           repository: nearprotocol/nearcore
           ref: ${{ env.RELEASE_VERSION }}
     
-      - name: Publish Latest Docker Image to Registry
+      - name: Publish-Latest-Docker-Image-to-Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
