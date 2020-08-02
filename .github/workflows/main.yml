@@ -2,10 +2,11 @@ name: Sync Fork
 
 on:
   schedule:
-    - cron: '*/60 * * * *'
+    - cron: '*/10 * * * *'
 
 env:
   REPO: "nearprotocol/nearcore"
+  DOCKER_BUILDKIT: 1 
 
 jobs:
   test:
@@ -78,7 +79,7 @@ jobs:
             echo "ADD hello /" >> Dockerfile
             echo 'CMD ["/hello"]' >> Dockerfile
             echo "Build a new image: $github_tag"
-            docker build --file Dockerfile --tag nearcore:$github_tag .
+            #docker build --file Dockerfile --tag nearcore:$github_tag .
             echo "Currenw PWD!"
             echo $PWD
             echo ::set-env name=RELEASE_VERSION::$(echo $github_tag)
@@ -96,15 +97,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: ${{ env.RELEASE_VERSION }}
           
-      - name: Build Latest Docker Image
+      - name: Clone nearcore
         if: ${{ success() }}
-        run: | 
-          github_tag=`cat github-tag.txt`
-          docker rmi nearcore:$github_tag
-          git clone -b $github_tag https://github.com/nearprotocol/nearcore.git
-          cd nearcore
-          DOCKER_BUILDKIT=1 docker build . --file Dockerfile --tag nearcore:latest
-
+        uses: actions/checkout@v2
+        with:
+          repository: nearprotocol/nearcore
+          ref: ${{ env.RELEASE_VERSION }}
+    
       - name: Publish Latest Docker Image to Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
