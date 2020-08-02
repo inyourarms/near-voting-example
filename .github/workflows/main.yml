@@ -11,6 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Check Github Tag
         run: |
           latest_release=$(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq .[0])
@@ -24,7 +25,6 @@ jobs:
           else
             echo $github_tag > github-tag.txt
           fi
-      - uses: actions/checkout@v2
       - name: Get Docker Hub Tags   
         if: ${{ success() }}
         env:
