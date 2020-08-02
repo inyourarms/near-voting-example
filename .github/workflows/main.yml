@@ -75,18 +75,10 @@ jobs:
           
           echo ::set-env name=RELEASE_VERSION::$(echo $github_tag)
           
-          if [ ${#TAGS[@]} -eq 2 ]; then
-            touch hello
-            echo "FROM scratch" > Dockerfile
-            echo "ADD hello /" >> Dockerfile
-            echo 'CMD ["/hello"]' >> Dockerfile
-            echo "Build a new image: $github_tag"
-            #docker build --file Dockerfile --tag nearcore:$github_tag .
-            echo "Currenw PWD!"
-            echo $PWD
-          else
-            echo "TAGS not zero"
-          fi
+          touch hello && echo "FROM scratch" > Dockerfile
+          echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
+          echo "Build a new image: $github_tag"
+          #docker build --file Dockerfile --tag nearcore:$github_tag .
 
 
       - name: Publish GitHub Tag to Registry
