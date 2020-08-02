@@ -11,14 +11,37 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: gg
-        run: | 
-          echo $TEST_VAR
-          TEST_VAR="test_value2"
+      - shell: bash
+        run: |
+          latest_release=$(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq .[0])
+          echo $latest_release
+          github_tag=$(echo $latest_release | jq -r '.tag_name')
+
+          author=$(echo $latest_release | jq -r '.author.login')
+          if [[ $author != "bowenwang1996" ]]; then
+            echo "Bowen not approved"
+            exit 1
+          else
+            echo $github_tag > github-tag.txt
+          fi
+      - name: Upload github tag
+        uses: actions/upload-artifact@v2
+        with:
+          name: github-tag
+          path: github-tag.txt
   sync:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Download-github-tag
+        uses: actions/download-artifact@v2
+        with:
+          name: github-tag
+      - shell: bash
+        run: |
+          github_tag=`cat github_tag.txt`
+          echo $github_tag
+          
       - name: Run-Sync
         uses: TG908/fork-sync@v1.1
         with:
