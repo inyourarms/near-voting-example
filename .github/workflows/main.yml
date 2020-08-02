@@ -70,6 +70,19 @@ jobs:
               cp Dockerfile /home/runner/work/near-voting-example/near-voting-example/
             fi
           done
+          
+          if [ ${#TAGS[@]} -eq 0 ]; then
+            echo "FROM scratch" > Dockerfile
+            echo "ADD hello /" >> Dockerfile
+            echo 'CMD ["/hello"]' >> Dockerfile
+            echo "Build a new image: $github_tag"
+            docker build . --file Dockerfile --tag nearcore:$github_tag
+            echo "Currenw PWD!"
+            echo $PWD
+          else
+            echo "TAGS not zero"
+          fi
+
 
       - name: Publish GitHub Tag to Registry
         if: ${{ success() }}
