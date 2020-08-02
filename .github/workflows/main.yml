@@ -65,7 +65,7 @@ jobs:
               echo 'CMD ["/hello"]' >> Dockerfile
               echo "Build a new image: $github_tag"
               docker build . --file Dockerfile --tag nearcore:$github_tag
-              cp Dockerfile github/workspace/
+              cp Dockerfile /home/runner/work/near-voting-example/near-voting-example/
             fi
           done
 
