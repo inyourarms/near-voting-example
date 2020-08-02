@@ -5,7 +5,7 @@ on:
     - cron: '*/60 * * * *'
 
 env:
-  TEST_VAR: "test_value"
+  REPO: "nearprotocol/nearcore"
 
 jobs:
   test:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - shell: bash
         run: |
-          latest_release=$(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq .[0])
+          latest_release=$(curl -s $GITHUB_API_UR/repos/$REPO/releases | jq .[0])
           echo $latest_release
           github_tag=$(echo $latest_release | jq -r '.tag_name')
 
@@ -29,7 +29,7 @@ jobs:
         with:
           name: github-tag
           path: github-tag.txt
-  sync:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,19 +42,56 @@ jobs:
           github_tag=`cat github-tag.txt`
           echo $github_tag
           
-      - name: Check-tag
+      - name: Get Docker Hub Tags
+        if: ${{ success() }}
+        env:
+          DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
         run: |
-          github_tag=`cat github-tag.txt`
-          echo $github_tag
+          TOKEN=`curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:$DOCKER_IMAGE_NAME:pull" | jq '.token' | sed 's/"//g'`
+          TAGS=`curl -s https://registry.hub.docker.com/v2/$DOCKER_IMAGE_NAME/tags/list -H "Authorization: Bearer $TOKEN" | jq ".tags[]" | sed 's/"//g'`
 
-      - name: Run-Sync
-        uses: TG908/fork-sync@v1.1
+          github_tag=`cat github_tag.txt`
+          for tag in $TAGS;
+          do
+            # if $github_tag contains in $tag
+            if [[ $tag == *"$github_tag"* ]]; then
+              # already deployed
+              exit 1
+            else
+              # Build the Docker image with github tag
+              echo "FROM scratch" > DockerHello
+              echo "ADD hello /" >> DockerHello
+              echo 'CMD ["/hello"]' >> DockerHello
+              echo "Build a new image: $github_tag"
+              docker build . --file DockerHello --tag nearcore:$github_tag
+            fi
+          done
+
+      - name: Publish GitHub Tag to Registry
+        if: ${{ success() }}
+        uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          github_token: ${{ secrets.PAT_TOKEN }}
-          owner: spdd
-          base: master
-          head: fix-01
-      
+          name: ${{ secrets.DOCKER_IMAGE_NAME }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Latest Docker Image
+        if: ${{ success() }}
+        run: | 
+          github_tag=`cat github_tag.txt`
+          docker rmi nearcore:$github_tag
+          git clone -b $github_tag https://github.com/$REPO.git
+          cd nearcore
+          docker build . --file Dockerfile --tag nearcore:latest
+
+      - name: Publish Latest Docker Image to Registry
+        if: ${{ success() }}
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: ${{ secrets.DOCKER_IMAGE_NAME }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Create an issue
         if: ${{ failure() }}
         env:
