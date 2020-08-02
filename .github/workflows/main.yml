@@ -39,7 +39,7 @@ jobs:
           name: github-tag
       - shell: bash
         run: |
-          github_tag=`cat github_tag.txt`
+          github_tag=`cat github-tag.txt`
           echo $github_tag
           
       - name: Check-tag
