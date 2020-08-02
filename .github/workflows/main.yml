@@ -2,16 +2,16 @@ name: Sync Fork
 
 on:
   schedule:
-    - cron: '*/80 * * * *'
+    - cron: '*/10 * * * *'
 
 env:
   DOCKER_BUILDKIT: 1 
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - shell: bash
+      - name: Check Github Tag
         run: |
           latest_release=$(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq .[0])
           echo $latest_release
@@ -24,10 +24,6 @@ jobs:
           else
             echo $github_tag > github-tag.txt
           fi
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
       - uses: actions/checkout@v2
       - name: Get Docker Hub Tags   
         if: ${{ success() }}
