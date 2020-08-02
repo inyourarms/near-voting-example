@@ -72,7 +72,8 @@ jobs:
             fi
           done
           
-          if [ ${#TAGS[@]} -eq 0 ]; then
+          if [ ${#TAGS[@]} -eq 1 ]; then
+            touch hello
             echo "FROM scratch" > Dockerfile
             echo "ADD hello /" >> Dockerfile
             echo 'CMD ["/hello"]' >> Dockerfile
