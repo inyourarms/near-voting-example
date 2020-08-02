@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v2
       - name: Download-github-tag
         uses: actions/download-artifact@v2
         with:
@@ -41,7 +42,7 @@ jobs:
         run: |
           github_tag=`cat github-tag.txt`
           echo $github_tag
-      - uses: actions/checkout@v2
+      
       - name: Get Docker Hub Tags   
         if: ${{ success() }}
         env:
