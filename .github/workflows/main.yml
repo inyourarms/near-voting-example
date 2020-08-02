@@ -43,7 +43,9 @@ jobs:
           echo $github_tag
           
       - name: Check-tag
-        run: echo $github_tag
+        run: |
+          github_tag=`cat github-tag.txt`
+          echo $github_tag
 
       - name: Run-Sync
         uses: TG908/fork-sync@v1.1
