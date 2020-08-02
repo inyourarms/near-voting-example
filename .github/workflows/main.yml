@@ -50,7 +50,7 @@ jobs:
           TOKEN=`curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:$DOCKER_IMAGE_NAME:pull" | jq '.token' | sed 's/"//g'`
           TAGS=`curl -s https://registry.hub.docker.com/v2/$DOCKER_IMAGE_NAME/tags/list -H "Authorization: Bearer $TOKEN" | jq ".tags[]" | sed 's/"//g'`
 
-          github_tag=`cat github_tag.txt`
+          github_tag=`cat github-tag.txt`
           for tag in $TAGS;
           do
             # if $github_tag contains in $tag
@@ -78,7 +78,7 @@ jobs:
       - name: Build Latest Docker Image
         if: ${{ success() }}
         run: | 
-          github_tag=`cat github_tag.txt`
+          github_tag=`cat github-tag.txt`
           docker rmi nearcore:$github_tag
           git clone -b $github_tag https://github.com/nearprotocol/nearcore.git
           cd nearcore
