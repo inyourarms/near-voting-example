@@ -97,7 +97,6 @@ jobs:
       - name: Build Latest Docker Image
         if: ${{ success() }}
         run: | 
-          rm /github/workspace/Dockerfile
           github_tag=`cat github-tag.txt`
           docker rmi nearcore:$github_tag
           git clone -b $github_tag https://github.com/nearprotocol/nearcore.git
