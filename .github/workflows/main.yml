@@ -58,7 +58,7 @@ jobs:
             if [[ $tag == *"$github_tag"* ]]; then
               # already deployed
               exit 1
-            else
+            elif [ -z "$tag" ]; then
               # Build the Docker image with github tag
               echo "FROM scratch" > Dockerfile
               echo "ADD hello /" >> Dockerfile
@@ -71,7 +71,7 @@ jobs:
             fi
           done
           
-          if [ ${#TAGS[@]} -eq 0 ]; then
+          if [ ${#TAGS[@]} -eq 1 ]; then
             echo "FROM scratch" > Dockerfile
             echo "ADD hello /" >> Dockerfile
             echo 'CMD ["/hello"]' >> Dockerfile
