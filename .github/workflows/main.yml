@@ -67,6 +67,8 @@ jobs:
           jq -r '.workflow_runs[0]')
 
           logs_url=$(echo $workflow_run | jq -r '.logs_url')
+          echo "Logs Url Here"
+          echo $logs_url
 
           job_id=$(echo $workflow_run | jq -r '.id')
 
