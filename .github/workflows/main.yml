@@ -77,7 +77,7 @@ jobs:
           job_name=$(echo $job | jq -r '.name')
           step_name=$(echo $job | jq -r .steps[$step_number].name)
           
-          curl -v -L -u "inyourarms":"$PAT_TOKEN" -o logs_$job_id.zip "$logs_url"
+          curl -v -L -u inyourarms:$PAT_TOKEN -o logs_$job_id.zip "$logs_url"
           mkdir logs_$job_id
           unzip logs_$job_id.zip -d logs_$job_id
           cd logs_$job_id/$job_name
@@ -88,4 +88,4 @@ jobs:
                             --arg im "$issue_msg" \
                             '{title: $sn, body: $im}' )
 
-          curl -u "inyourarms":"$PAT_TOKEN" -d "$json_data" "https://api.github.com/repos/spdd/near-voting-example/issues" 
+          curl -u inyourarms:$PAT_TOKEN -d "$json_data" "https://api.github.com/repos/spdd/near-voting-example/issues" 
