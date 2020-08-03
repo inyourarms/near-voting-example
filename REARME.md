@@ -31,3 +31,30 @@ on:
   schedule:
     - cron: '*/90 * * * *'
 ```
+Global environment variables:
+```
+env:
+  DOCKER_BUILDKIT: 1 
+```
+In our workflow we we have one job:
+```
+jobs:
+  build:
+```
+Also runs on Ubuntu latest 
+```
+runs-on: ubuntu-latest
+```
+Lets create a [strategy matrix](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) to build and deploy different releases for `testnet` and `betanet`.
+
+```
+    strategy:
+      matrix:
+        release-name: ["rc", "beta"]
+```
+
+As mentioned abowe jobs contain a list of steps, which GitHub executes in sequence.
+
+```
+
+```
