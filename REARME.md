@@ -54,11 +54,11 @@ strategy:
 ```
 
 As mentioned abowe jobs contain a list of steps, which GitHub executes in sequence.
-First step - **Get Github Tag** where the script downloading and saving a github tag for a given release name ("rc" or "beta")
+Step 1 - **Get Github Tag** where the script downloading and saving a github tag for a given release name ("rc" or "beta")
 ```
 echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg RELEASE_NAME "$RELEASE_NAME" 'map(select(.tag_name | contains($RELEASE_NAME)))[0].tag_name') > github-tag.txt
 ```
-Second step - **Get Docker Hub Tags** where the script checks the latest tags of docker images that we have already at our [docker hub](https://hub.docker.com) repository if a github tag from the previuos step exists in the docker repo then the workflow will be cancelled if not then we have a new github tag and it's the case to build and publish a new docker image
+Step 2 - **Get Docker Hub Tags** where the script checks the latest tags of docker images that we have already at our [docker hub](https://hub.docker.com) repository if a github tag from the previuos step exists in the docker repo then the workflow will be cancelled if not then we have a new github tag and it's the case to build and publish a new docker image
 
 >You have to create a secret github variable `DOCKER_IMAGE_NAME`
 ```
@@ -69,6 +69,9 @@ if: ${{ success() }}
         run: |
           ...
 ```
+Step 3 - **Publish GitHub Image Tag to Registry** where [elgohr/Publish-Docker-Github-Action@master](https://github.com/elgohr/Publish-Docker-Github-Action the action) is a pre-built action that publishes docker containers. It will publish our docker image with latest github tag (ex. `nearcore:1.8.0-beta.2`). 
+
+Step 4 - **Install Rust**
 
 
 
