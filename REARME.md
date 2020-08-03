@@ -118,7 +118,8 @@ sudo docker logs nearcore -f
 
 ## Watchtower
 
-To automate updates of our docker images we can use a great open source tool [Watchtower](https://github.com/containrrr/watchtower)
+To automate updates of our docker images we can use a great open source tool [Watchtower](https://github.com/containrrr/watchtower).
+
 Watchtower monitors running containers and watches for changes to the images those containers were originally started from. When Watchtower detects that an image has changed, it automatically restarts the container using the new image.  
 
 >With watchtower you can update the running version of your containerized app simply by pushing a new image to the Docker Hub or your own image registry. Watchtower will pull down your new image, gracefully shut down your existing container and restart it with the same options that were used when it was deployed initially. 
