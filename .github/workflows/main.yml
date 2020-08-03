@@ -1,4 +1,4 @@
-name: Sync Fork
+name: CICD
 
 on:
   schedule:
@@ -10,21 +10,17 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        release-name: ["rc", "beta"]
     steps:
       - uses: actions/checkout@v2
       - name: Check Github Tag
+        env: 
+          RELEASE_NAME: ${{ matrix.release-name }}
         run: |
-          latest_release=$(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq .[0])
-          echo $latest_release
-          github_tag=$(echo $latest_release | jq -r '.tag_name')
+          $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c map(select(.tag_name | contains("$RELEASE_NAME")))[0].tag_name) > github-tag.txt
 
-          author=$(echo $latest_release | jq -r '.author.login')
-          if [[ $author != "bowenwang1996" ]]; then
-            echo "Bowen not approved"
-            exit 1
-          else
-            echo $github_tag > github-tag.txt
-          fi
       - name: Get Docker Hub Tags   
         if: ${{ success() }}
         env:
@@ -32,14 +28,13 @@ jobs:
         run: |
           TOKEN=`curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:$DOCKER_IMAGE_NAME:pull" | jq '.token' | sed 's/"//g'`
           TAGS=`curl -s https://registry.hub.docker.com/v2/$DOCKER_IMAGE_NAME/tags/list -H "Authorization: Bearer $TOKEN" | jq ".tags[]" | sed 's/"//g'`
-
           github_tag=`cat github-tag.txt`
           for tag in $TAGS;
           do
             # if $github_tag contains in $tag
             if [[ $tag == *"$github_tag"* ]]; then
-              echo "The tag:$tag already deployed"
-              exit 1
+              echo "Tag:$tag already deployed"
+              #exit 1
             elif [ -z "$tag" ]; then
               # Create an empty Dockerfile for a Docker image with github tag 
               touch hello && echo "FROM scratch" > Dockerfile
@@ -49,6 +44,12 @@ jobs:
           
           echo ::set-env name=RELEASE_VERSION::$(echo $github_tag)
 
+          # If docker hub is empty
+          if [ ${#TAGS[@]} -eq 1 ]; then
+              touch hello && echo "FROM scratch" > Dockerfile
+              echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
+          fi
+
       - name: Publish GitHub Tag to Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
@@ -57,14 +58,23 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: ${{ env.RELEASE_VERSION }}
-          
+
+      - name: Install Rust
+        if: ${{ success() }}
+        uses: hecrj/setup-rust-action@v1
+        with:
+          rust-version: nightly-2020-03-19
+
       - name: Clone NEARCore
         if: ${{ success() }}
         uses: actions/checkout@v2
         with:
           repository: nearprotocol/nearcore
           ref: ${{ env.RELEASE_VERSION }}
-    
+
+      - name: Test
+        run: cargo test    
+
       - name: Publish-Latest-Docker-Image-to-Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
@@ -72,43 +82,4 @@ jobs:
           name: ${{ secrets.DOCKER_IMAGE_NAME }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Create an issue
-        if: ${{ failure() }}
-        env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          github_tag=`cat github-tag.txt`
-          echo $github_tag
-          
-          echo "Print test var"
-          echo $TEST_VAR
-          
-          workflow_run=$(curl https://api.github.com/repos/inyourarms/near-voting-example/actions/runs | 
-          jq -r '.workflow_runs[0]')
-
-          logs_url=$(echo $workflow_run | jq -r '.logs_url')
-          echo "Logs Url Here"
-          echo $logs_url
-
-          job_id=$(echo $workflow_run | jq -r '.id')
-
-          step_number=0
-
-          job=$(curl https://api.github.com/repos/inyourarms/near-voting-example/actions/runs/$job_id/jobs |  jq -r '.jobs[0]')
-
-          job_name=$(echo $job | jq -r '.name')
-          step_name=$(echo $job | jq -r .steps[$step_number].name)
-          
-          curl -v -L -u inyourarms:$PAT_TOKEN -o logs_$job_id.zip "$logs_url"
-          mkdir logs_$job_id
-          unzip logs_$job_id.zip -d logs_$job_id
-          cd logs_$job_id/$job_name
-          issue_msg="$(cat $(($step_number + 1))_$step_name.txt)"
-
-          json_data=$( jq -n \
-                            --arg sn "$step_name" \
-                            --arg im "$issue_msg" \
-                            '{title: $sn, body: $im}' )
-
-          curl -u inyourarms:$PAT_TOKEN -d "$json_data" "https://api.github.com/repos/spdd/near-voting-example/issues" 
+          tags: ${{ matrix.release-name }}
