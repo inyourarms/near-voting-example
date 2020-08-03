@@ -54,6 +54,7 @@ strategy:
 ```
 
 As mentioned abowe jobs contain a list of steps, which GitHub executes in sequence.
+
 Step 1 - **Get Github Tag** where the script downloading and saving a github tag for a given release name ("rc" or "beta")
 ```
 echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg RELEASE_NAME "$RELEASE_NAME" 'map(select(.tag_name | contains($RELEASE_NAME)))[0].tag_name') > github-tag.txt
