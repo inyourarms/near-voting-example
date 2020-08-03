@@ -29,7 +29,8 @@ Our workflow will trigger by schedule event:
 ```
 on:
   schedule:
-    - cron: '*/90 * * * *'
+    # Run the workflow every 10 minutes
+    - cron: '*/10* * * *'
 ```
 Global environment variables:
 ```
@@ -55,11 +56,11 @@ strategy:
 
 As mentioned abowe jobs contain a list of steps, which GitHub executes in sequence.
 
-Step 1 - **Get Github Tag** where the script downloading and saving a github tag for a given release name ("rc" or "beta")
+Step 1: **Get Github Tag** where the script downloading and saving a github tag for a given release name ("rc" or "beta")
 ```
 echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg RELEASE_NAME "$RELEASE_NAME" 'map(select(.tag_name | contains($RELEASE_NAME)))[0].tag_name') > github-tag.txt
 ```
-Step 2 - **Get Docker Hub Tags** where the script checks the latest tags of docker images that we have already at our [docker hub](https://hub.docker.com) repository if a github tag from the previuos step exists in the docker repo then the workflow will be cancelled if not then we have a new github tag and it's the case to build and publish a new docker image
+Step 2: **Get Docker Hub Tags** where the script checks the latest tags of docker images that we have already at our [docker hub](https://hub.docker.com) repository if a github tag from the previuos step exists in the docker repo then the workflow will be cancelled if not then we have a new github tag and it's the case to build and publish a new docker image
 
 >You have to create a secret github variable `DOCKER_IMAGE_NAME`
 ```
@@ -70,9 +71,18 @@ if: ${{ success() }}
         run: |
           ...
 ```
-Step 3 - **Publish GitHub Image Tag to Registry** where [elgohr/Publish-Docker-Github-Action@master](https://github.com/elgohr/Publish-Docker-Github-Action the action) is a pre-built action that publishes docker containers. It will publish our docker image with latest github tag (ex. `nearcore:1.8.0-beta.2`). 
+Step 3: **Publish GitHub Image Tag to Registry** where [elgohr/Publish-Docker-Github-Action@master](https://github.com/elgohr/Publish-Docker-Github-Action the action) is a pre-built action that publishes docker containers. It will build and publish a docker image with the latest github tag (ex. `nearcore:1.8.0-beta.2`).
+The logic of this step is to save the latest github tag to a docker hub repo as a docker image and then check the tags every time to build and publish only new releases of nearcore.
 
-Step 4 - **Install Rust**
+Step 4: **Install Rust** - an action which install Rust.
+
+Step 5: **Clone NEARCore** - an action which clone [nearcore](https://github.com/nearprotocol/nearcore) with a specific tag.
+
+Step 6: **Cargo Test** - execute tests of a nearcore packages.
+
+Step 7: **Publish Latest Docker Image to Registry** - will build and publish a docker image with `${{ matrix.release-name }}`("rc" or "beta") tag.
+
+
 
 
 
