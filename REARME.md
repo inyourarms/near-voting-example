@@ -80,8 +80,10 @@ Step 3: **Publish GitHub Image Tag to Registry** where [elgohr/Publish-Docker-Gi
 The logic of this step is to save the latest github tag to a docker hub repo as a docker image and then check the tags every time to build and publish only new releases of nearcore.
 
 >`DOCKER_USERNAME` - a Docker ID.
+
 >`DOCKER_PASSWORD` - a Docker ID password.
->You have to create a secret github variables `DOCKER_USERNAME` and `DOCKER_PASSWORD`. -> [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
+
+You have to create a secret github variables `DOCKER_USERNAME` and `DOCKER_PASSWORD`. -> [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
 
 Step 4: **Install Rust** - an action which install Rust.
 
