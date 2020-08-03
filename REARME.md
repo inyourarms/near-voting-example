@@ -31,7 +31,7 @@ Let get started to dive deep into our CI/CD workflow.
 
 In the repository you will see our workflow `.github/workflows/cicd.yml`
 
-Our workflow will trigger by schedule event:
+Our workflow will trigger by schedule event (trigger every 10 minutes):
 ```
 on:
   schedule:
@@ -132,7 +132,9 @@ $ sudo docker run -d \
     -v /var/run/docker.sock:/var/run/docker.sock \
     containrrr/watchtower
 ```
-Now, Watchtower will start monitoring `nearcore:beta` container. When the workflow push the new image to Docker Hub, Watchtower, will detect that a new image is available(about 5-6 minutes). It will gracefully stop the container and start the container using the new image.
+Now, Watchtower will start monitoring `nearcore:beta` container. When the workflow push the a image to Docker Hub, Watchtower, will detect that a new image is available(about 5-6 minutes). It will gracefully stop the container and start the container using the new image.
 
+## Conclusion
 
+Hopefully this guide along with the workflow will make it easier for you to use Github Actions to build and deploy a new releases of [NEARCore](https://github.com/nearprotocol/nearcore).
 
