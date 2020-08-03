@@ -19,7 +19,7 @@ jobs:
         env: 
           RELEASE_NAME: ${{ matrix.release-name }}
         run: |
-          $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg RELEASE_NAME "$RELEASE_NAME" 'map(select(.tag_name | contains($RELEASE_NAME)))[0].tag_name') > github-tag.txt
+          echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg RELEASE_NAME "$RELEASE_NAME" 'map(select(.tag_name | contains($RELEASE_NAME)))[0].tag_name') > github-tag.txt
 
       - name: Get Docker Hub Tags   
         if: ${{ success() }}
