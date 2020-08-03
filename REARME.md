@@ -1,6 +1,6 @@
 ![CICD](https://github.com/inyourarms/near-voting-example/workflows/CICD/badge.svg)
 
-# A Fully Automated Docker Deployment using GitHub Actions and Watchtower
+# A Fully Automated NEARCore Docker Deployment using GitHub Actions and Watchtower
 
 In this guide I will explain how to create a github actions workflow that automatically tests, builds, and deploys a Docker image built from the latest source code (tags) of [NEARCore](https://github.com/nearprotocol/nearcore) repository.
 
