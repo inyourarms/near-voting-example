@@ -98,6 +98,12 @@ Step 7: **Publish Latest Docker Image to Registry** - will build and publish a d
 
 ## NEARCore Docker
 
+#### Install Docker (if not installed)
+```
+sudo apt-get update
+sudo apt install docker.io
+```
+
 If you are using [nearup](https://github.com/near/nearup) just stop the node:
 
 ```
