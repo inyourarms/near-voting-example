@@ -15,7 +15,7 @@ jobs:
         release-name: ["rc", "beta"]
     steps:
       - uses: actions/checkout@v2
-      - name: Check Github Tag
+      - name: Get Github Tag
         env: 
           RELEASE_NAME: ${{ matrix.release-name }}
         run: |
