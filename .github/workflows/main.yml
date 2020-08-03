@@ -72,7 +72,7 @@ jobs:
           repository: nearprotocol/nearcore
           ref: ${{ env.RELEASE_VERSION }}
 
-      - name: Test
+      - name: Cargo Test
         run: cargo test    
 
       - name: Publish-Latest-Docker-Image-to-Registry
