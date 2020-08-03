@@ -128,7 +128,7 @@ Watchtower monitors running containers and watches for changes to the images tho
 
 Run the watchtower container on your node with the following command:
 ```
-$ sudo docker run -d \
+sudo docker run -d \
     --name watchtower \
     -v /var/run/docker.sock:/var/run/docker.sock \
     containrrr/watchtower
