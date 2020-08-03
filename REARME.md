@@ -2,7 +2,7 @@
 
 # A Fully Automated NEARCore Docker Deployment using GitHub Actions and Watchtower
 
-In this guide I will explain how to create a github actions workflow that automatically tests, builds, and deploys a Docker images built from the latest source code (tags: "rc" and "beta") of [NEARCore](https://github.com/nearprotocol/nearcore) repository.
+In this guide I will explain how to create a github actions workflow that automatically tests, builds, and deploys a Docker images that built from the latest source code (tags: "rc" and "beta") of [NEARCore](https://github.com/nearprotocol/nearcore) repository.
 
 ## Getting started
 
