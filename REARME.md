@@ -78,7 +78,7 @@ if: ${{ success() }}
         run: |
           ...
 ```
-Step 3: **Publish GitHub Image Tag to Registry** where [elgohr/Publish-Docker-Github-Action@master](https://github.com/elgohr/Publish-Docker-Github-Action the action) is a pre-built action that publishes docker containers. It will build and publish a docker image with the latest github tag (ex. `nearcore:1.8.0-beta.2`).
+Step 3: **Publish GitHub Image Tag to Registry** where [elgohr/Publish-Docker-Github-Action@master](https://github.com/elgohr/Publish-Docker-Github-Action the action) is a pre-built action that publishes docker containers. It will build and publish a docker images with the latest github tags (ex. `nearcore:1.8.0-beta.2` or `nearcore:1.7.0-rc.5`).
 The logic of this step is to save the latest github tag to a docker hub repo as a docker image and then check the tags every time to build and publish only new releases of nearcore.
 
 >`DOCKER_USERNAME` - a Docker ID.
@@ -93,7 +93,7 @@ Step 5: **Clone NEARCore** - an action which clone [nearcore](https://github.com
 
 Step 6: **Cargo Test** - execute tests of a nearcore packages.
 
-Step 7: **Publish Latest Docker Image to Registry** - will build and publish a docker image with `${{ matrix.release-name }}`("rc" or "beta") tag.
+Step 7: **Publish Latest Docker Image to Registry** - will build and publish(concurrently) a docker images with `${{ matrix.release-name }}`(ex. `nearcore:beta` or `nearcore:rc`) tags.
 
 
 ## NEARCore Docker
