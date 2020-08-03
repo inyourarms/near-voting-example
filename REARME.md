@@ -83,7 +83,7 @@ The logic of this step is to save the latest github tag to a docker hub repo as 
 
 >`DOCKER_PASSWORD` - a Docker ID password.
 
-You have to create a secret github variables `DOCKER_USERNAME` and `DOCKER_PASSWORD`. -> [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
+>You have to create a secret github variables `DOCKER_USERNAME` and `DOCKER_PASSWORD`. -> [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
 
 Step 4: **Install Rust** - an action which install Rust.
 
@@ -93,6 +93,22 @@ Step 6: **Cargo Test** - execute tests of a nearcore packages.
 
 Step 7: **Publish Latest Docker Image to Registry** - will build and publish a docker image with `${{ matrix.release-name }}`("rc" or "beta") tag.
 
+## Watchtower
+
+To automate updates of our docker images we can use a great open source tool [Watchtower](https://github.com/containrrr/watchtower)
+Watchtower monitors running containers and watches for changes to the images those containers were originally started from. When Watchtower detects that an image has changed, it automatically restarts the container using the new image.  
+
+>With watchtower you can update the running version of your containerized app simply by pushing a new image to the Docker Hub or your own image registry. Watchtower will pull down your new image, gracefully shut down your existing container and restart it with the same options that were used when it was deployed initially. 
+
+> With watchtower you can update nearcore, node exporter, near exporter,.... 
+
+Run the watchtower container on your node with the following command:
+```
+$ sudo docker run -d \
+    --name watchtower \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    containrrr/watchtower
+```
 
 
 
