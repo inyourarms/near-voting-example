@@ -48,13 +48,27 @@ runs-on: ubuntu-latest
 Lets create a [strategy matrix](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) to build and deploy different releases for `testnet` and `betanet`.
 
 ```
-    strategy:
-      matrix:
-        release-name: ["rc", "beta"]
+strategy:
+  matrix:
+    release-name: ["rc", "beta"]
 ```
 
 As mentioned abowe jobs contain a list of steps, which GitHub executes in sequence.
+First step - **Get Github Tag** where the script downloading and saving a github tag for a given release name ("rc" or "beta")
+```
+echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg RELEASE_NAME "$RELEASE_NAME" 'map(select(.tag_name | contains($RELEASE_NAME)))[0].tag_name') > github-tag.txt
+```
+Second step - **Get Docker Hub Tags** where the script checks the latest tags of docker images that we have already at our [docker hub](https://hub.docker.com) repository if a github tag from the previuos step exists in the docker repo then the workflow will be cancelled if not then we have a new github tag and it's the case to build and publish a new docker image
 
+>You have to create a secret github variable `DOCKER_IMAGE_NAME`
+```
+# if previous step is success
+if: ${{ success() }}
+        env:
+          DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
+        run: |
+          ...
 ```
 
-```
+
+
