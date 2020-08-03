@@ -50,7 +50,7 @@ jobs:
               echo "ADD hello /" >> Dockerfile && echo 'CMD ["/hello"]' >> Dockerfile
           fi
 
-      - name: Publish GitHub Tag to Registry
+      - name: Publish GitHub Tag Image to Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -75,7 +75,7 @@ jobs:
       - name: Cargo Test
         run: cargo test    
 
-      - name: Publish-Latest-Docker-Image-to-Registry
+      - name: Publish Latest Docker Image to Registry
         if: ${{ success() }}
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
