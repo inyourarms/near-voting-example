@@ -62,7 +62,7 @@ echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq 
 ```
 Step 2: **Get Docker Hub Tags** where the script checks the latest tags of docker images that we have already at our [docker hub](https://hub.docker.com) repository if a github tag from the previuos step exists in the docker repo then the workflow will be cancelled if not then we have a new github tag and it's the case to build and publish a new docker image
 
->You have to create a secret github variable `DOCKER_IMAGE_NAME`
+>You have to create a secret github variable `DOCKER_IMAGE_NAME`. [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
 ```
 # if previous step is success
 if: ${{ success() }}
@@ -73,6 +73,8 @@ if: ${{ success() }}
 ```
 Step 3: **Publish GitHub Image Tag to Registry** where [elgohr/Publish-Docker-Github-Action@master](https://github.com/elgohr/Publish-Docker-Github-Action the action) is a pre-built action that publishes docker containers. It will build and publish a docker image with the latest github tag (ex. `nearcore:1.8.0-beta.2`).
 The logic of this step is to save the latest github tag to a docker hub repo as a docker image and then check the tags every time to build and publish only new releases of nearcore.
+
+>You have to create a secret github variables `DOCKER_USERNAME` and `DOCKER_PASSWORD`. [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
 
 Step 4: **Install Rust** - an action which install Rust.
 
