@@ -19,7 +19,7 @@ jobs:
         env: 
           RELEASE_NAME: ${{ matrix.release-name }}
         run: |
-          $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c map(select(.tag_name | contains("$RELEASE_NAME")))[0].tag_name) > github-tag.txt
+          $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq -c -r --arg RELEASE_NAME "$RELEASE_NAME" 'map(select(.tag_name | contains($RELEASE_NAME)))[0].tag_name') > github-tag.txt
 
       - name: Get Docker Hub Tags   
         if: ${{ success() }}
@@ -34,7 +34,7 @@ jobs:
             # if $github_tag contains in $tag
             if [[ $tag == *"$github_tag"* ]]; then
               echo "Tag:$tag already deployed"
-              #exit 1
+              exit 1
             elif [ -z "$tag" ]; then
               # Create an empty Dockerfile for a Docker image with github tag 
               touch hello && echo "FROM scratch" > Dockerfile
