@@ -2,7 +2,7 @@ name: CICD
 
 on:
   schedule:
-    - cron: '*/90 * * * *'
+    - cron: '*/1000 * * * *'
 
 env:
   DOCKER_BUILDKIT: 1 
