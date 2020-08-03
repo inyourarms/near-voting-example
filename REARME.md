@@ -98,7 +98,14 @@ Step 7: **Publish Latest Docker Image to Registry** - will build and publish a d
 
 ## NEARCore Docker
 
-After the first run of our workflow a new docker images(testnet,beta) should be awailable and we can run the near node container with the following command:
+If you are using [nearup](https://github.com/near/nearup) just stop the node:
+
+```
+nearup stop
+```
+>In the future if you will not use docker, you can use nearup again without any problems. 
+
+After the first run of our workflow a new docker images(testnet,beta) should be awailable and we can run the near node with the following command:
 ```
 sudo docker run -dti \
      --restart always \
