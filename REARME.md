@@ -2,7 +2,7 @@
 
 # A Fully Automated NEARCore Docker Deployment using GitHub Actions and Watchtower
 
-In this guide I will explain how to create a github actions workflow that automatically tests, builds, and deploys a Docker image built from the latest source code (tags) of [NEARCore](https://github.com/nearprotocol/nearcore) repository.
+In this guide I will explain how to create a github actions workflow that automatically tests, builds, and deploys a Docker images built from the latest source code (tags: "rc" and "beta") of [NEARCore](https://github.com/nearprotocol/nearcore) repository.
 
 ## Getting started
 
@@ -20,6 +20,8 @@ Jobs contain a list of steps, which GitHub executes in sequence. A step can be a
 GitHub Actions is free for all open-source projects, and private repositories get up to [2000 minutes per month](https://github.com/features/actions#pricing-details)(33,33 hours). For smaller projects, this means being able to take full advantage of automation from the very beginning at no extra cost. You can even use the system for free forever if you use self-hosted runners.
 
 ## CI/CD Workflow
+
+>The workflow will create a two docker images with tags: `dockerusername/nearcore:beta`(betanet) and `dockerusername/nearcore:rc`(testnet)
 
 >If you don't have a Docker ID. Go to the Docker Hub and [create an account](https://docs.docker.com/docker-hub/). 
 
@@ -66,7 +68,7 @@ echo $(curl -s https://api.github.com/repos/nearprotocol/nearcore/releases | jq 
 ```
 Step 2: **Get Docker Hub Tags** where the script checks the latest tags of docker images that we have already at our [docker hub](https://hub.docker.com) repository if a github tag from the previuos step exists in the docker repo then the workflow will be cancelled if not then we have a new github tag and it's the case to build and publish a new docker image
 
-> `DOCKER_IMAGE_NAME` - [a Docker Hub repository](https://docs.docker.com/docker-hub/repos/). (ex. `dockerusername/nearcore`)  
+> `DOCKER_IMAGE_NAME` - [a public docker hub repository](https://docs.docker.com/docker-hub/repos/). (ex. `dockerusername/nearcore`)  
 >You have to create a secret github variable `DOCKER_IMAGE_NAME`. -> [Creating and storing encrypted secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
 ```
 # if previous step is success
@@ -93,6 +95,27 @@ Step 6: **Cargo Test** - execute tests of a nearcore packages.
 
 Step 7: **Publish Latest Docker Image to Registry** - will build and publish a docker image with `${{ matrix.release-name }}`("rc" or "beta") tag.
 
+
+## NEARCore Docker
+
+After the first run of our workflow a new docker images(testnet,beta) should be awailable and we can run the near node container with the following command:
+```
+sudo docker run -dti \
+     --restart always \
+     --user 0 \
+     --volume $HOME/.near/betanet/:/srv/near \
+     --volume /tmp:/tmp \
+     --name nearcore \
+     --network=host \
+     -p 3030 \
+     -p 24567 dockerusername/nearcore:beta near --home /srv/near run
+```
+
+To watch the logs:
+```
+sudo docker logs nearcore -f
+```
+
 ## Watchtower
 
 To automate updates of our docker images we can use a great open source tool [Watchtower](https://github.com/containrrr/watchtower)
@@ -109,7 +132,7 @@ $ sudo docker run -d \
     -v /var/run/docker.sock:/var/run/docker.sock \
     containrrr/watchtower
 ```
-
+Now, Watchtower will start monitoring `nearcore:beta` container. When the workflow push the new image to Docker Hub, Watchtower, will detect that a new image is available(about 5-6 minutes). It will gracefully stop the container and start the container using the new image.
 
 
 
